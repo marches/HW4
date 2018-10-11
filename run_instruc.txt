@@ -1,3 +1,2 @@
 iverilog -o register register.t.v
-
 iverilog -o regfile regfile.t.v
