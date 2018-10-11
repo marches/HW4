@@ -1,8 +1,6 @@
 The << operator shifts the LHS by the number of bits on the RHS. 
 
-If enable is 1'b1 and address is (20)_10 (represented in binary, of course), then 1 << (20)_10 will result in out = (20)_10 = 10100 (represented in 32 bits, so zero padded on the RHS). 
-
-I assume that because out is 32 bits, enable is zero padded in some way, otherwise the << operator would mostly just result in out being set to 0. 
+If enable is high and address 4'b0010 then out = 0.....0100
 
 
 
