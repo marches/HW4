@@ -93,7 +93,7 @@ output reg[4:0]		WriteRegister,
 output reg		RegWrite,
 output reg		Clk
 );
-
+  
   // Initialize register driver signals
   initial begin
     WriteData=32'd0;
@@ -103,6 +103,8 @@ output reg		Clk
     RegWrite=0;
     Clk=0;
   end
+
+  
 
   // Once 'begintest' is asserted, start running test cases
   always @(posedge begintest) begin
@@ -128,7 +130,6 @@ output reg		Clk
 
   // Test Case 2: 
   //   Write '15' to register 2, verify with Read Ports 1 and 2
-  //   (Fails with example register file, but should pass with yours)
   WriteRegister = 5'd2;
   WriteData = 32'd15;
   RegWrite = 1;
@@ -141,11 +142,72 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  // Test Case 3:
+  //  Register 0 is a register and not 0
+  WriteRegister = 5'd0;
+  WriteData = 32'd15;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 !== 0) || (ReadData2 !== 0)) begin
+    dutpassed = 0;
+    $display("Test Case 3 Failed");
+  end
 
   // All done!  Wait a moment and signal test completion.
   #5
   endtest = 1;
 
+  // Test Case 4:
+  //  Port 2 is broken and always reads register 14
+  WriteRegister = 5'd14;
+  WriteData = 32'd25;
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd15;
+  WriteData = 32'd13;
+  ReadRegister1 = 5'd14;
+  ReadRegister2 = 5'd15;
+  #5 Clk=1; #5 Clk=0;
+
+  if (ReadData1 == ReadData2) begin
+    $display("Test Case 4 Failed");
+  end
+  
+  // Test Case 5: 
+  //   Always writing even without RegWrite enabled
+  WriteRegister = 5'd2;
+  WriteData = 32'd42;
+  RegWrite = 1;
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd2;
+  WriteData = 32'd3;
+  RegWrite = 0;
+  ReadRegister1 = 5'd2;
+  ReadRegister2 = 5'd2;
+  #5 Clk=1; #5 Clk=0; 
+
+  if((ReadData1 == 3) || (ReadData2 == 3)) begin
+    dutpassed = 0;  
+    $display("Test Case 5 Failed");
+  end
+
+  // Test Cae 6:
+  //  Decoder broken
+
+  WriteRegister = 5'd20;
+  WriteData = 32'd12;
+  RegWrite = 1;
+  ReadRegister1 = 5'd16;
+  ReadRegister2 = 5'd18;
+  #5 Clk=1; #5 Clk=0; 
+
+  if((ReadData1 == 12) || (ReadData2 == 12)) begin
+    dutpassed = 0;
+    $display("Test Case 6 Failed");
+  end
+  
 end
 
 endmodule
